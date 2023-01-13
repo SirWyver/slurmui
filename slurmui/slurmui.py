@@ -337,7 +337,7 @@ def get_sinfo():
     overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
     for row in df.iterrows():
         host_info = parse_gres(row[1]['GRES'])
-        host_avail_info = parse_gres_used(row[1]['GRES_USED'])
+        host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
         host_info.update(host_avail_info)
         host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
         host_info['Host'] = str(row[1]["HOSTNAMES"])
