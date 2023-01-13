@@ -31,55 +31,55 @@ SQUEUE_DEBUG = """
 """
 
 SINFO_DEBUG = """
-HOSTNAMES           GRES                                              GRES_USED
-andram              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-andram              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-angmar              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-angmar              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-balar               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-balar               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-balrog              gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)
-balrog              gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)
-char                gpu:gtx_1080:4,mps:gtx_1080:800                   gpu:gtx_1080:4(IDX:0-3),mps:gtx_1080:0(IDX:N/A)
-char                gpu:gtx_1080:4,mps:gtx_1080:800                   gpu:gtx_1080:4(IDX:0-3),mps:gtx_1080:0(IDX:N/A)
-daidalos            gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-daidalos            gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-doriath             gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-doriath             gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-erebor              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-erebor              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-eriador             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-eriador             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-falas               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-falas               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-gimli               gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)
-gimli               gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)
-gondor              gpu:rtx_2080:9,mps:rtx_2080:900                   gpu:rtx_2080:9(IDX:0-8),mps:rtx_2080:0(IDX:N/A)
-gondor              gpu:rtx_2080:9,mps:rtx_2080:900                   gpu:rtx_2080:9(IDX:0-8),mps:rtx_2080:0(IDX:N/A)
-himring             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-himring             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-hithlum             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-hithlum             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-ikarus              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-ikarus              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-lothlann            gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:7(IDX:1-7),mps:rtx_2080:0(IDX:N/A)
-lothlann            gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:7(IDX:1-7),mps:rtx_2080:0(IDX:N/A)
-moria               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)
-moria               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)
-pegasus             gpu:gtx_1080:8,mps:gtx_1080:800                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)
-pegasus             gpu:gtx_1080:8,mps:gtx_1080:800                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)
-ramdal              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-ramdal              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)
-seti                gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:0(IDX:N/A),mps:rtx_2080:0(IDX:N/A)
-seti                gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:0(IDX:N/A),mps:rtx_2080:0(IDX:N/A)
-sorona              gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)
-sorona              gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)
-tarsonis            gpu:gtx_1080:4,mps:gtx_1080:400                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)
-tarsonis            gpu:gtx_1080:4,mps:gtx_1080:400                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)
-umoja               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:7(IDX:0-4,6-7),mps:rtx_2080:0(IDX:N/A
-umoja               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:7(IDX:0-4,6-7),mps:rtx_2080:0(IDX:N/A
-valinor             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
-valinor             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)
+HOSTNAMES           GRES                                              GRES_USED                                                                       STATE
+andram              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+andram              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+angmar              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+angmar              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+balar               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+balar               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+balrog              gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:7(IDX:0-3,5-7),mps:rtx_3090:0(IDX:N/A)                             mix
+balrog              gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:7(IDX:0-3,5-7),mps:rtx_3090:0(IDX:N/A)                             mix
+char                gpu:gtx_1080:4,mps:gtx_1080:800                   gpu:gtx_1080:4(IDX:0-3),mps:gtx_1080:0(IDX:N/A)                                 mix
+char                gpu:gtx_1080:4,mps:gtx_1080:800                   gpu:gtx_1080:4(IDX:0-3),mps:gtx_1080:0(IDX:N/A)                                 mix
+daidalos            gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+daidalos            gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+doriath             gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+doriath             gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+erebor              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+erebor              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+eriador             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+eriador             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+falas               gpu:a100:4,mps:a100:400                           gpu:a100:3(IDX:0-2),mps:a100:0(IDX:N/A)                                         mix
+falas               gpu:a100:4,mps:a100:400                           gpu:a100:3(IDX:0-2),mps:a100:0(IDX:N/A)                                         mix
+gimli               gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)                                 mix
+gimli               gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)                                 mix
+gondor              gpu:rtx_2080:9,mps:rtx_2080:900                   gpu:rtx_2080:9(IDX:0-8),mps:rtx_2080:0(IDX:N/A)                                 mix
+gondor              gpu:rtx_2080:9,mps:rtx_2080:900                   gpu:rtx_2080:9(IDX:0-8),mps:rtx_2080:0(IDX:N/A)                                 mix
+himring             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+himring             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+hithlum             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+hithlum             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+ikarus              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+ikarus              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+lothlann            gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
+lothlann            gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
+moria               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
+moria               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
+pegasus             gpu:gtx_1080:8,mps:gtx_1080:800                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
+pegasus             gpu:gtx_1080:8,mps:gtx_1080:800                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
+ramdal              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+ramdal              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
+seti                gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:0(IDX:N/A),mps:rtx_2080:0(IDX:N/A)                                 drain
+seti                gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:0(IDX:N/A),mps:rtx_2080:0(IDX:N/A)                                 drain
+sorona              gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
+sorona              gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
+tarsonis            gpu:gtx_1080:4,mps:gtx_1080:400                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
+tarsonis            gpu:gtx_1080:4,mps:gtx_1080:400                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
+umoja               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:6(IDX:0,2-4,6-7),mps:rtx_2080:0(IDX:N/A)                           mix
+umoja               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:6(IDX:0,2-4,6-7),mps:rtx_2080:0(IDX:N/A)                           mix
+valinor             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
+valinor             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
 """
 
 def sqeue_debug():
@@ -121,11 +121,15 @@ def sinfo_debug():
     df = pd.read_csv(data, sep=" ")
     overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
     for row in df.iterrows():
+        node_available = row[1]["STATE"] in ["mix", "idle"]
         host_info = parse_gres(row[1]['GRES'])
+        if not node_available:
+            host_info["#Total"] = 0 
         host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
         host_info.update(host_avail_info)
         host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
         host_info['Host'] = str(row[1]["HOSTNAMES"])
+
         overview_df.append(host_info)
     overview_df = pd.DataFrame.from_records(overview_df).drop_duplicates("Host")
     overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX"]]
@@ -330,17 +334,21 @@ def perform_scancel(job_id):
 
 
 def get_sinfo():
-    response_string = subprocess.check_output("""sinfo --Node -O 'NodeHost,Gres:50,GresUsed:50'""", shell=True).decode("utf-8")
+    response_string = subprocess.check_output("""sinfo --Node -O 'NodeHost,Gres:50,GresUsed:80,StateCompact'""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=" ")
     overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
     for row in df.iterrows():
+        node_available = row[1]["STATE"] in ["mix", "idle"]
         host_info = parse_gres(row[1]['GRES'])
+        if not node_available:
+            host_info["#Total"] = 0 
         host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
         host_info.update(host_avail_info)
         host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
         host_info['Host'] = str(row[1]["HOSTNAMES"])
+
         overview_df.append(host_info)
     overview_df = pd.DataFrame.from_records(overview_df).drop_duplicates("Host")
     overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX"]]
