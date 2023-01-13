@@ -11,8 +11,10 @@ To start, use type `slurmui`
 | Shortcut | Description               |
 |----------|---------------------------|
 |d | delete job (Confirm with <<Enter>>) |
-|l | see log|
+|l | display log|
+|g | display gpus |
 |r | refresh |
-|q/<Escape> | Abort|
+|s | sort by column |
+|q / <Escape> | Abort|
 |Arrow keys | cursor up/down |
 |<Ctrl+C> | Quit |

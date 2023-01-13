@@ -9,145 +9,18 @@ import subprocess
 import pandas as pd
 import re
 import os
-
-### ---> FOR DEBUGGING
-
-SQUEUE_DEBUG = """
-  JOBID PA                                     NAME  USER    STATE       TIME TIME_L NODE NODELIST(REASON)
-            190689 in                              interactive bob  RUNNING       9:46 6:00:00    1 lothlann
-            190663 su                             triplane3_ll bob  RUNNING    2:56:36 4-00:00:00    1 himring
-            190662 su                             triplane2_ll bob  RUNNING    2:56:40 4-00:00:00    1 himring
-            190661 su                             triplane1_ll bob  RUNNING    2:56:46 4-00:00:00    1 himring
-            190660 su                              triplane1_l bob  RUNNING    2:57:04 4-00:00:00    1 himring
-            190659 su                              triplane2_l bob  RUNNING    2:57:10 4-00:00:00    1 balrog
-            190658 su                              triplane3_l bob  RUNNING    2:57:28 4-00:00:00    1 balrog
-            190657 su                              triplane3_m bob  RUNNING    2:57:31 4-00:00:00    1 balrog
-            190656 su                              triplane2_m bob  RUNNING    2:57:36 4-00:00:00    1 balrog
-            190655 su                              triplane1_m bob  RUNNING    2:57:39 4-00:00:00    1 balrog
-            190654 su                              triplane1_m bob  RUNNING    2:57:43 4-00:00:00    1 angmar
-            190651 su                              triplane0_m bob  RUNNING    3:03:06 4-00:00:00    1 valinor
-            190650 su                             triplane0_ll bob  RUNNING    3:03:13 4-00:00:00    1 valinor
-            190649 su                              triplane0_l bob  RUNNING    3:03:17 4-00:00:00    1 valinor
-"""
-
-SINFO_DEBUG = """
-HOSTNAMES           GRES                                              GRES_USED                                                                       STATE
-andram              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-andram              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-angmar              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-angmar              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-balar               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-balar               gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-balrog              gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:7(IDX:0-3,5-7),mps:rtx_3090:0(IDX:N/A)                             mix
-balrog              gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:7(IDX:0-3,5-7),mps:rtx_3090:0(IDX:N/A)                             mix
-char                gpu:gtx_1080:4,mps:gtx_1080:800                   gpu:gtx_1080:4(IDX:0-3),mps:gtx_1080:0(IDX:N/A)                                 mix
-char                gpu:gtx_1080:4,mps:gtx_1080:800                   gpu:gtx_1080:4(IDX:0-3),mps:gtx_1080:0(IDX:N/A)                                 mix
-daidalos            gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-daidalos            gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-doriath             gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-doriath             gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-erebor              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-erebor              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-eriador             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-eriador             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-falas               gpu:a100:4,mps:a100:400                           gpu:a100:3(IDX:0-2),mps:a100:0(IDX:N/A)                                         mix
-falas               gpu:a100:4,mps:a100:400                           gpu:a100:3(IDX:0-2),mps:a100:0(IDX:N/A)                                         mix
-gimli               gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)                                 mix
-gimli               gpu:rtx_3090:8,mps:rtx_3090:800                   gpu:rtx_3090:8(IDX:0-7),mps:rtx_3090:0(IDX:N/A)                                 mix
-gondor              gpu:rtx_2080:9,mps:rtx_2080:900                   gpu:rtx_2080:9(IDX:0-8),mps:rtx_2080:0(IDX:N/A)                                 mix
-gondor              gpu:rtx_2080:9,mps:rtx_2080:900                   gpu:rtx_2080:9(IDX:0-8),mps:rtx_2080:0(IDX:N/A)                                 mix
-himring             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-himring             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-hithlum             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-hithlum             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-ikarus              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-ikarus              gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-lothlann            gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
-lothlann            gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
-moria               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
-moria               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
-pegasus             gpu:gtx_1080:8,mps:gtx_1080:800                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
-pegasus             gpu:gtx_1080:8,mps:gtx_1080:800                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
-ramdal              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-ramdal              gpu:a100:4,mps:a100:400                           gpu:a100:4(IDX:0-3),mps:a100:0(IDX:N/A)                                         mix
-seti                gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:0(IDX:N/A),mps:rtx_2080:0(IDX:N/A)                                 drain
-seti                gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:0(IDX:N/A),mps:rtx_2080:0(IDX:N/A)                                 drain
-sorona              gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
-sorona              gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:8(IDX:0-7),mps:rtx_2080:0(IDX:N/A)                                 mix
-tarsonis            gpu:gtx_1080:4,mps:gtx_1080:400                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
-tarsonis            gpu:gtx_1080:4,mps:gtx_1080:400                   gpu:gtx_1080:0(IDX:N/A),mps:gtx_1080:0(IDX:N/A)                                 idle
-umoja               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:6(IDX:0,2-4,6-7),mps:rtx_2080:0(IDX:N/A)                           mix
-umoja               gpu:rtx_2080:8,mps:rtx_2080:800                   gpu:rtx_2080:6(IDX:0,2-4,6-7),mps:rtx_2080:0(IDX:N/A)                           mix
-valinor             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-valinor             gpu:rtx_a6000:8,mps:rtx_a6000:800                 gpu:rtx_a6000:8(IDX:0-7),mps:rtx_a6000:0(IDX:N/A)                               mix
-"""
-
-def sqeue_debug():
-    SQUEUE_DEBUG2 = re.sub(' +', ' ', SQUEUE_DEBUG)
-    data = io.StringIO(SQUEUE_DEBUG2)
-    df = pd.read_csv(data, sep=" ")
-    del df[df.columns[0]]
-    return df
-
-def parse_gres_used(gres_used_str, num_total):
-    _,device,num_gpus,alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\),.*",gres_used_str).groups()
-    num_gpus = int(num_gpus)
-    alloc_gpus = []
-    for gpu_ids in alloc_str.split(","):
-        if "-" in gpu_ids:
-            start, end = gpu_ids.split("-")
-            for i in range(int(start), int(end)+1):
-                alloc_gpus.append(i)
-        else:
-            if gpu_ids == "N/A":
-                pass
-            else:
-                alloc_gpus.append(int(gpu_ids))
-            
-    return {"Device": device,
-            "#Alloc": num_gpus,
-            "Free IDX": [idx for idx in range(num_total) if idx not in alloc_gpus]}
-
-
-def parse_gres(gres_str):
-    _,device,num_gpus = re.match("(.*):(.*):(.*),.*",gres_str).groups()
-    num_gpus = int(num_gpus)
-    return {"Device": device,
-            "#Total": num_gpus}
-
-def sinfo_debug():
-    SINFO_DEBUG2 = re.sub(' +', ' ', SINFO_DEBUG)
-    data = io.StringIO(SINFO_DEBUG2)
-    df = pd.read_csv(data, sep=" ")
-    overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
-    for row in df.iterrows():
-        node_available = row[1]["STATE"] in ["mix", "idle"]
-        host_info = parse_gres(row[1]['GRES'])
-        if not node_available:
-            host_info["#Total"] = 0 
-        host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
-        host_info.update(host_avail_info)
-        host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
-        host_info['Host'] = str(row[1]["HOSTNAMES"])
-
-        overview_df.append(host_info)
-    overview_df = pd.DataFrame.from_records(overview_df).drop_duplicates("Host")
-    overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX"]]
-    return overview_df
-
+from .debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
 
 DEBUG = False
-
-#### <---
 
 class SlurmUI(App):
 
     BINDINGS = [
         ("d", "stage_delete", "Delete job"),
-        ("r", "refresh", "Refresh"),
-        ("s", "sort", "Sort"),
         ("l", "display_log", "Log"),
         ("g", "display_gpu", "GPU"),
+        ("r", "refresh", "Refresh"),
+        ("s", "sort", "Sort"),
         ("q", "abort_quit", "Quit"),
         ("enter", "confirm", "Confirm"),
         ("escape", "abort_quit", "Abort"),  
@@ -169,7 +42,7 @@ class SlurmUI(App):
 
     
     def query_squeue(self, sort_column=None, sort_ascending=True):
-        squeue_df = get_squeue() if not DEBUG else sqeue_debug()
+        squeue_df = get_squeue() 
         if sort_column is not None:
             squeue_df = squeue_df.sort_values(squeue_df.columns[sort_column],ascending=sort_ascending)
         self.sqeue_df = squeue_df
@@ -186,6 +59,7 @@ class SlurmUI(App):
         self.table.focus()
 
     def action_refresh(self):
+        self.query_gpus()
         if self.STAGE["action"] == "monitor":
             self.update_squeue_table()
         elif self.STAGE["action"] == "log":
@@ -240,7 +114,7 @@ class SlurmUI(App):
             self.txt_log.write(str(e))
 
     def query_gpus(self,  sort_column=None, sort_ascending=True):
-        overview_df = get_sinfo() if not DEBUG else sinfo_debug()
+        overview_df = get_sinfo()
         if sort_column is not None:
             overview_df = overview_df.sort_values(overview_df.columns[sort_column],ascending=sort_ascending)
         
@@ -332,9 +206,38 @@ class SlurmUI(App):
 def perform_scancel(job_id):
     os.system(f"""scancel {job_id}""")
 
+def parse_gres_used(gres_used_str, num_total):
+    _,device,num_gpus,alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\),.*",gres_used_str).groups()
+    num_gpus = int(num_gpus)
+    alloc_gpus = []
+    for gpu_ids in alloc_str.split(","):
+        if "-" in gpu_ids:
+            start, end = gpu_ids.split("-")
+            for i in range(int(start), int(end)+1):
+                alloc_gpus.append(i)
+        else:
+            if gpu_ids == "N/A":
+                pass
+            else:
+                alloc_gpus.append(int(gpu_ids))
+            
+    return {"Device": device,
+            "#Alloc": num_gpus,
+            "Free IDX": [idx for idx in range(num_total) if idx not in alloc_gpus]}
+
+
+def parse_gres(gres_str):
+    _,device,num_gpus = re.match("(.*):(.*):(.*),.*",gres_str).groups()
+    num_gpus = int(num_gpus)
+    return {"Device": device,
+            "#Total": num_gpus}
+
 
 def get_sinfo():
-    response_string = subprocess.check_output("""sinfo --Node -O 'NodeHost,Gres:50,GresUsed:80,StateCompact'""", shell=True).decode("utf-8")
+    if DEBUG:
+        response_string = SINFO_DEBUG
+    else:
+        response_string = subprocess.check_output("""sinfo --Node -O 'NodeHost,Gres:50,GresUsed:80,StateCompact'""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=" ")
@@ -356,7 +259,10 @@ def get_sinfo():
 
 
 def get_squeue():
-    response_string = subprocess.check_output("""squeue --format="%.18i %.2P %.40j %.5u %.8T %.10M %.6l %.4D %R" --me -S T""", shell=True).decode("utf-8")
+    if DEBUG:
+        response_string = SQUEUE_DEBUG
+    else:
+        response_string = subprocess.check_output("""squeue --format="%.18i %.2P %.40j %.5u %.8T %.10M %.6l %.4D %R" --me -S T""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=" ")
