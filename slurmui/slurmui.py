@@ -330,13 +330,16 @@ def perform_scancel(job_id):
 
 
 def get_sinfo():
-    response_string = subprocess.check_output("""sinfo --Node -O "NodeHost,GresUsed:200""", shell=True).decode("utf-8")
+    response_string = subprocess.check_output("""sinfo --Node -O 'NodeHost,Gres:50,GresUsed:50'""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=" ")
     overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
     for row in df.iterrows():
-        host_info = parse_gres_used(row[1]['GRES_USED'])
+        host_info = parse_gres(row[1]['GRES'])
+        host_avail_info = parse_gres_used(row[1]['GRES_USED'])
+        host_info.update(host_avail_info)
+        host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
         host_info['Host'] = str(row[1]["HOSTNAMES"])
         overview_df.append(host_info)
     overview_df = pd.DataFrame.from_records(overview_df).drop_duplicates("Host")
