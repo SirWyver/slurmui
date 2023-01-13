@@ -89,7 +89,7 @@ def sqeue_debug():
     del df[df.columns[0]]
     return df
 
-def parse_gres_used(gres_used_str):
+def parse_gres_used(gres_used_str, num_total):
     _,device,num_gpus,alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\),.*",gres_used_str).groups()
     num_gpus = int(num_gpus)
     alloc_gpus = []
@@ -100,13 +100,13 @@ def parse_gres_used(gres_used_str):
                 alloc_gpus.append(i)
         else:
             if gpu_ids == "N/A":
-                alloc_gpus = list(range(num_gpus))
+                pass
             else:
                 alloc_gpus.append(int(gpu_ids))
             
     return {"Device": device,
             "#Alloc": num_gpus,
-            "Free IDX": [idx for idx in range(num_gpus) if idx not in alloc_gpus]}
+            "Free IDX": [idx for idx in range(num_total) if idx not in alloc_gpus]}
 
 
 def parse_gres(gres_str):
@@ -122,7 +122,7 @@ def sinfo_debug():
     overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
     for row in df.iterrows():
         host_info = parse_gres(row[1]['GRES'])
-        host_avail_info = parse_gres_used(row[1]['GRES_USED'])
+        host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
         host_info.update(host_avail_info)
         host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
         host_info['Host'] = str(row[1]["HOSTNAMES"])
