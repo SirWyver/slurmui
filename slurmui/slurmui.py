@@ -9,7 +9,7 @@ import subprocess
 import pandas as pd
 import re
 import os
-from .debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
+from slurmui.debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
 
 DEBUG = False
 
