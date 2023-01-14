@@ -184,7 +184,7 @@ class SlurmUI(App):
                 perform_scancel(self.STAGE['job_id'])
                 self.txt_log.write(f"{self.STAGE['job_id']} - {self.STAGE['job_name']} deleted")
                 self.update_squeue_table()
-                self.STAGE = None
+                self.STAGE["action"] = "monitor"
 
 
     def action_abort(self):
