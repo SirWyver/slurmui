@@ -9,7 +9,7 @@ import subprocess
 import pandas as pd
 import re
 import os
-from debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
+from slurmui.debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
 
 DEBUG = False
 
@@ -98,10 +98,11 @@ class SlurmUI(App):
         self.txt_log.styles.border = ("heavy","white")
 
     def action_stage_delete(self):
-        job_id, job_name = self._get_selected_job()
-        self.txt_log.clear()
-        self.txt_log.write(f"Delete: {job_id} - {job_name}? Press <<ENTER>> to confirm")
-        self.STAGE = {"action": "delete", "job_id": job_id, "job_name": job_name}
+        if self.STAGE['action'] == "monitor":
+            job_id, job_name = self._get_selected_job()
+            self.txt_log.clear()
+            self.txt_log.write(f"Delete: {job_id} - {job_name}? Press <<ENTER>> to confirm")
+            self.STAGE = {"action": "delete", "job_id": job_id, "job_name": job_name}
 
     def action_display_log(self):
         job_id, job_name = self._get_selected_job()
@@ -243,7 +244,7 @@ def get_sinfo():
     df = pd.read_csv(data, sep=" ")
     overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
     for row in df.iterrows():
-        node_available = row[1]["STATE"] in ["mix", "idle"]
+        node_available = row[1]["STATE"] in ["mix", "idle", "alloc"]
         host_info = parse_gres(row[1]['GRES'])
         if not node_available:
             host_info["#Total"] = 0 
