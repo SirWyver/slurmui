@@ -99,17 +99,23 @@ class SlurmUI(App):
 
     def action_stage_delete(self):
         if self.STAGE['action'] == "monitor":
-            job_id, job_name = self._get_selected_job()
-            self.txt_log.clear()
-            self.txt_log.write(f"Delete: {job_id} - {job_name}? Press <<ENTER>> to confirm")
-            self.STAGE = {"action": "delete", "job_id": job_id, "job_name": job_name}
+            try:
+                job_id, job_name = self._get_selected_job()
+                self.txt_log.clear()
+                self.txt_log.write(f"Delete: {job_id} - {job_name}? Press <<ENTER>> to confirm")
+                self.STAGE = {"action": "delete", "job_id": job_id, "job_name": job_name}
+            except Exception as e:
+                self.txt_log.clear()
+                self.txt_log.write(str(e))
+
 
     def action_display_log(self):
-        job_id, job_name = self._get_selected_job()
-        self.STAGE = {"action": "log", "job_id": job_id, "job_name": job_name}
-        self._maximize_text_log()
         try:
-            self.update_log(job_id)
+            if self.STAGE["action"] == "monitor":
+                job_id, job_name = self._get_selected_job()
+                self.STAGE = {"action": "log", "job_id": job_id, "job_name": job_name}
+                self._maximize_text_log()
+                self.update_log(job_id)
         except Exception as e:
             self.txt_log.clear()
             self.txt_log.write(str(e))
