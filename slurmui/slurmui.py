@@ -270,12 +270,11 @@ def get_squeue():
     if DEBUG:
         response_string = SQUEUE_DEBUG
     else:
-        sep = "+=+="
+        sep = "|"
         response_string = subprocess.check_output(f"""squeue --format="%.18i{sep}%.2P{sep}%.40j{sep}%.5u{sep}%.8T{sep}%.10M{sep}%.6l{sep}%.4D{sep}%R" --me -S T""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=sep)
-    del df[df.columns[0]]
     return df 
 
 def get_log_fn(job_id):
