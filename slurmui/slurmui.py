@@ -266,13 +266,15 @@ def get_sinfo():
 
 
 def get_squeue():
+    
     if DEBUG:
         response_string = SQUEUE_DEBUG
     else:
-        response_string = subprocess.check_output("""squeue --format="%.18i %.2P %.40j %.5u %.8T %.10M %.6l %.4D %R" --me -S T""", shell=True).decode("utf-8")
+        sep = "+=+="
+        response_string = subprocess.check_output(f"""squeue --format="%.18i{sep}%.2P{sep}%.40j{sep}%.5u{sep}%.8T{sep}%.10M{sep}%.6l{sep}%.4D{sep}%R" --me -S T""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
-    df = pd.read_csv(data, sep=" ")
+    df = pd.read_csv(data, sep=sep)
     del df[df.columns[0]]
     return df 
 
