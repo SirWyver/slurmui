@@ -282,8 +282,11 @@ def get_squeue():
     return df 
 
 def get_job_gpu_ids(job_id):
-    response_string = subprocess.check_output(f"""srun --jobid {job_id} '/bin/env' | grep SLURM_STEP_GPUS""", shell=True).decode("utf-8")
-    formatted_string = response_string.split("=")[-1].strip()
+    try:
+        response_string = subprocess.check_output(f"""srun --jobid {job_id} '/bin/env' | grep SLURM_STEP_GPUS""", shell=True).decode("utf-8")
+        formatted_string = response_string.split("=")[-1].strip()
+    except Exception as e:
+        return "N/A"
     return formatted_string
 
 
