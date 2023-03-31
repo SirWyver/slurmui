@@ -278,7 +278,7 @@ def get_squeue():
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=sep)
-    df.columns = [x.trim() for x in df.columns]
+    df.columns = [x.strip() for x in df.columns]
     return df 
 
 def get_job_gpu_ids(job_id):
