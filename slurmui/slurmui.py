@@ -53,7 +53,7 @@ class SlurmUI(App):
         self.table.clear()
         squeue_df = self.query_squeue(sort_column=sort_column, sort_ascending=sort_ascending)
         # add device information
-        squeue_df["GPU_IDS"] = squeue_df["JOBID"].apply(lambda x: get_job_gpu_ids(x))
+        squeue_df[squeue_df["PA"]!="in"]["GPU_IDS"] = squeue_df[squeue_df["PA"]!="in"]["JOBID"].apply(lambda x: get_job_gpu_ids(x))
         self.table.columns = []
         self.table.add_columns(*squeue_df.columns)
         for row in squeue_df.iterrows():
