@@ -51,6 +51,8 @@ class SlurmUI(App):
     def update_squeue_table(self, sort_column=None, sort_ascending=True):
         self.table.clear()
         squeue_df = self.query_squeue(sort_column=sort_column, sort_ascending=sort_ascending)
+        # add device information
+        squeue_df["GPU_IDS"] = squeue_df["JobID"].apply(lambda x: get_job_gpu_ids(x))
         self.table.columns = []
         self.table.add_columns(*squeue_df.columns)
         for row in squeue_df.iterrows():
@@ -276,6 +278,12 @@ def get_squeue():
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=sep)
     return df 
+
+def get_job_gpu_ids(job_id):
+    response_string = subprocess.check_output(f"""srun --jobid {job_id} '/bin/env' | grep SLURM_STEP_GPUS""", shell=True).decode("utf-8")
+    formatted_string = response_string.split("=")[-1].strip()
+    return formatted_string
+
 
 def get_log_fn(job_id):
     response_string = subprocess.check_output(f"""scontrol show job {job_id} | grep StdOut""", shell=True).decode("utf-8")
