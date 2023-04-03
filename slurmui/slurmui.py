@@ -54,7 +54,9 @@ class SlurmUI(App):
         squeue_df = self.query_squeue(sort_column=sort_column, sort_ascending=sort_ascending)
         # add device information
         squeue_df["GPU_IDS"] = "N/A"
-        squeue_df["GPU_IDS"][squeue_df["PA"]!="in"] = squeue_df[squeue_df["PA"]!="in"]["JOBID"].apply(lambda x: get_job_gpu_ids(x))
+        real_session_mask = squeue_df["PA"]!="in"
+        if real_session_mask.any():
+            squeue_df["GPU_IDS"][real_session_mask] = squeue_df[real_session_mask]["JOBID"].apply(lambda x: get_job_gpu_ids(x))
         self.table.columns = []
         self.table.add_columns(*squeue_df.columns)
         for row in squeue_df.iterrows():
