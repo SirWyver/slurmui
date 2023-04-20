@@ -93,9 +93,10 @@ class SlurmUI(App):
     #     log_screen.on_ready()
 
     def _get_selected_job(self):
-        selected_column = self.table.cursor_cell.row
-        job_id = self.table.data[selected_column][0]
-        job_name = self.table.data[selected_column][2]
+        row_idx = self.table.cursor_row
+        row = self.table.get_row_at(row_idx)
+        job_id = row[0]
+        job_name = row[2]
         return job_id, job_name
 
     def _minimize_text_log(self):
