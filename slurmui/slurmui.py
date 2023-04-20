@@ -9,7 +9,11 @@ import subprocess
 import pandas as pd
 import re
 import os
-from ._version import __version__
+if __name__ == "__main__":
+    from _version import __version__
+else:
+    from ._version import __version__
+
 
 DEBUG = False
 if DEBUG:
@@ -288,8 +292,12 @@ def get_squeue():
 
 def get_job_gpu_ids(job_id):
     try:
-        response_string = subprocess.check_output(f"""srun --jobid {job_id} '/bin/env' | grep SLURM_STEP_GPUS""", shell=True,stderr=subprocess.STDOUT).decode("utf-8")
-        formatted_string = response_string.split("=")[-1].strip()
+        # response_string = subprocess.check_output(f"""srun --jobid {job_id} '/bin/env' | grep SLURM_STEP_GPUS""", shell=True,stderr=subprocess.STDOUT, timeout=0.3).decode("utf-8")
+        # response_string = subprocess.check_output(f"""scontrol --dd show job {job_id} | grep GRES=gpu:""", shell=True).decode("utf-8")
+        # gpu_ids = re.match(response_string, ".*GRES=gpu:.*\(IDX:(.*)\)").groups()[0]
+        # formatted_string = gpu_ids # response_string.split("=")[-1].strip()
+        response_string = subprocess.check_output(f"""scontrol show jobid -dd {job_id} | grep GRES""", shell=True).decode("utf-8")
+        formatted_string = response_string.split(":")[-1].strip()[:-1]
     except:
         return "N/A"
     return formatted_string
