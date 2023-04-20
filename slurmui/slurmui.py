@@ -9,6 +9,7 @@ import subprocess
 import pandas as pd
 import re
 import os
+from ._version import __version__
 
 DEBUG = False
 if DEBUG:
@@ -56,7 +57,7 @@ class SlurmUI(App):
         squeue_df["GPU_IDS"] = "N/A"
         real_session_mask = squeue_df["PA"]!="in"
         if real_session_mask.any():
-            squeue_df["GPU_IDS"][real_session_mask] = squeue_df[real_session_mask]["JOBID"].apply(lambda x: get_job_gpu_ids(x))
+            squeue_df["GPU_IDS"][real_session_mask] = "bobo" #squeue_df[real_session_mask]["JOBID"].apply(lambda x: get_job_gpu_ids(x))
         self.table.columns = []
         self.table.add_columns(*squeue_df.columns)
         for row in squeue_df.iterrows():
@@ -135,7 +136,7 @@ class SlurmUI(App):
         # also change the title to include GPU information
         total_num_gpus = overview_df["#Total"].sum()
         total_available = overview_df["#Avail"].sum()
-        self.title = f"SlurmUI --- GPU STATS: {total_available}/{total_num_gpus}"
+        self.title = f"SlurmUI --- GPU STATS: {total_available}/{total_num_gpus} -- Version: {__version__}"
         return overview_df
 
 
@@ -288,7 +289,7 @@ def get_job_gpu_ids(job_id):
     try:
         response_string = subprocess.check_output(f"""srun --jobid {job_id} '/bin/env' | grep SLURM_STEP_GPUS""", shell=True).decode("utf-8")
         formatted_string = response_string.split("=")[-1].strip()
-    except Exception as e:
+    except:
         return "N/A"
     return formatted_string
 

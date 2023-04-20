@@ -1,11 +1,12 @@
 import setuptools
+from slurmui._version import __version__
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="slurmui",
-    version="0.2.9.3",
+    version=__version__,
     author="Norman Müller",
     author_email="norman.mueller@tum.de",
     url="https://github.com/SirWyver/slurmui",
