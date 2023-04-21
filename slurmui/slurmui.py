@@ -1,5 +1,6 @@
 import io
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.widgets import DataTable
 from textual.widgets import Button, Header, Footer, Static, Label, TextLog, Input
 from textual.containers import Container, Vertical 
@@ -22,18 +23,18 @@ if DEBUG:
 class SlurmUI(App):
 
     BINDINGS = [
-        ("d", "stage_delete", "Delete job"),
-        ("l", "display_log", "Log"),
-        ("g", "display_gpu", "GPU"),
-        ("r", "refresh", "Refresh"),
-        ("s", "sort", "Sort"),
-        ("q", "abort_quit", "Quit"),
-        ("enter", "confirm", "Confirm"),
-        ("escape", "abort_quit", "Abort"),  
+        Binding("d", "stage_delete", "Delete job"),
+        Binding("l", "display_log", "Log"),
+        Binding("g", "display_gpu", "GPU"),
+        Binding("r", "refresh", "Refresh"),
+        Binding("s", "sort", "Sort"),
+        Binding("q", "abort_quit", "Quit"),
+        Binding("enter", "confirm", "Confirm", priority=True),
+        Binding("escape", "abort_quit", "Abort"),
         # ("k", "scroll_up", "Up")    
 
     ]
-    STAGE = {"action": "monitor"} 
+    STAGE = {"action": "monitor"}
     gpu_overview_df = None
     sqeue_df =None
 
