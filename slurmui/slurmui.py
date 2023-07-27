@@ -218,8 +218,7 @@ class SlurmUI(App):
 
     def action_abort_quit(self):
         if self.STAGE["action"] == "monitor":
-            # self.emit_no_wait(message=Message())
-            self.action_quit()
+            self.exit(0)
         else:
             self.action_abort()
 
