@@ -258,7 +258,8 @@ def get_sinfo():
     if DEBUG:
         response_string = SINFO_DEBUG
     else:
-        response_string = subprocess.check_output("""sinfo --Node -O 'NodeHost,Gres:50,GresUsed:80,StateCompact'""", shell=True).decode("utf-8")
+        filter_cluster = f""
+        response_string = subprocess.check_output(f"""sinfo --Node {filter_cluster} -O 'NodeHost,Gres:50,GresUsed:80,StateCompact,FreeMem,CPUsState'""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=" ")
@@ -271,11 +272,16 @@ def get_sinfo():
         host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
         host_info.update(host_avail_info)
         host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
+        host_info['Mem (GB)'] = int(row[1]["FREE_MEM"]) // 1024
+
+        cpu_info = row[1]["CPUS(A/I/O/T)"].split("/")
+        host_info['#CPUs Idle'] = cpu_info[1]
+        host_info['#CPUs Alloc'] = cpu_info[0]
         host_info['Host'] = str(row[1]["HOSTNAMES"])
 
         overview_df.append(host_info)
     overview_df = pd.DataFrame.from_records(overview_df).drop_duplicates("Host")
-    overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX"]]
+    overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX", "Mem (GB)", "#CPUs Idle", "#CPUs Alloc"]]
     return overview_df
 
 
@@ -285,7 +291,7 @@ def get_squeue():
         response_string = SQUEUE_DEBUG
     else:
         sep = "|"
-        response_string = subprocess.check_output(f"""squeue --format="%.18i{sep}%.2P{sep}%.40j{sep}%.5u{sep}%.8T{sep}%.10M{sep}%.6l{sep}%.4D{sep}%R" --me -S T""", shell=True).decode("utf-8")
+        response_string = subprocess.check_output(f"""squeue --format="%.18i{sep}%Q{sep}%.2P{sep}%.40j{sep}%.5u{sep}%.8T{sep}%.10M{sep}%.6l{sep}%S{sep}%.4D{sep}%R" --me -S T""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=sep)
