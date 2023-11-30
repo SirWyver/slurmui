@@ -24,7 +24,7 @@ setuptools.setup(
         "console_scripts": ["slurmui=slurmui.slurmui_cli:slurmui_cli"],
     },
     install_requires=[
-        "textual",
+        "textual==0.31.0",
         "pandas"
     ],
 )
