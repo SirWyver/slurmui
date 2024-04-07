@@ -2,7 +2,7 @@ import io
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import DataTable
-from textual.widgets import Button, Header, Footer, Static, Label, TextLog, Input
+from textual.widgets import Button, Header, Footer, Static, Label, RichLog, Input
 from textual.containers import Container, Vertical 
 from textual.containers import Grid
 from textual.screen import Screen
@@ -43,7 +43,7 @@ class SlurmUI(App):
         self.footer = Footer()
         self.table = DataTable( id="table")
         self.table.zebra_stripes = True
-        self.txt_log = TextLog(wrap=True, highlight=True, id="info")
+        self.txt_log = RichLog(wrap=True, highlight=True, id="info")
         yield self.header
         yield Container(self.table, self.txt_log)
         yield self.footer
