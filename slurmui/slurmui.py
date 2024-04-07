@@ -1,3 +1,4 @@
+import sys
 import io
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -21,6 +22,8 @@ if DEBUG:
     from slurmui.debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
 
 class SlurmUI(App):
+
+    cluster = None
 
     BINDINGS = [
         Binding("d", "stage_delete", "Delete job"),
@@ -226,8 +229,13 @@ class SlurmUI(App):
 def perform_scancel(job_id):
     os.system(f"""scancel {job_id}""")
 
+
 def parse_gres_used(gres_used_str, num_total):
-    _,device,num_gpus,alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\),.*",gres_used_str).groups()
+    if len(sys.argv) > 1:
+        _, device, num_gpus, alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\)", gres_used_str).groups()
+    else:
+        _, device, num_gpus, alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\),.*", gres_used_str).groups()
+
     num_gpus = int(num_gpus)
     alloc_gpus = []
     for gpu_ids in alloc_str.split(","):
@@ -247,34 +255,62 @@ def parse_gres_used(gres_used_str, num_total):
 
 
 def parse_gres(gres_str):
-    _,device,num_gpus = re.match("(.*):(.*):(.*),.*",gres_str).groups()
-    num_gpus = int(num_gpus)
-    return {"Device": device,
-            "#Total": num_gpus}
+    if len(sys.argv) > 1:
+        _,num_gpus, _ = re.match("(.*):(.*)\(S:(.*)\)", gres_str).groups()
+        num_gpus = int(num_gpus)
+        return {"Device": "gpu",
+                "#Total": num_gpus}
+
+    else:
+        _, device, num_gpus = re.match("(.*):(.*):(.*),.*", gres_str).groups()
+        num_gpus = int(num_gpus)
+        return {"Device": device,
+                "#Total": num_gpus}
+
+
+
 
 
 def get_sinfo():
     if DEBUG:
         response_string = SINFO_DEBUG
     else:
-        response_string = subprocess.check_output("""sinfo --Node -O 'NodeHost,Gres:50,GresUsed:80,StateCompact'""", shell=True).decode("utf-8")
+        if len(sys.argv) > 1:
+            # cluster = sys.argv[2]
+            filter_cluster = f"-p 'mcml-dgx-a100-40x8'"
+        else:
+            filter_cluster = f""
+        response_string = subprocess.check_output(f"""sinfo --Node {filter_cluster} -O 'NodeHost,Gres:50,GresUsed:80,StateCompact,FreeMem,CPUsState'""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=" ")
     overview_df = [ ]# pd.DataFrame(columns=['Host', "Device", "#Avail", "#Total", "Free IDX"])
     for row in df.iterrows():
         node_available = row[1]["STATE"] in ["mix", "idle", "alloc"]
-        host_info = parse_gres(row[1]['GRES'])
+
+        # if "mcml" not in row[1]["HOSTNAMES"]:
+        #     continue
+
+        if row[1]['GRES'] != "(null)":
+            host_info = parse_gres(row[1]['GRES'])
+        else:
+            continue
+
         if not node_available:
             host_info["#Total"] = 0 
         host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
         host_info.update(host_avail_info)
         host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
+        host_info['Mem (GB)'] = int(row[1]["FREE_MEM"]) // 1024
+
+        cpu_info = row[1]["CPUS(A/I/O/T)"].split("/")
+        host_info['#CPUs Idle'] = cpu_info[1]
+        host_info['#CPUs Alloc'] = cpu_info[0]
         host_info['Host'] = str(row[1]["HOSTNAMES"])
 
         overview_df.append(host_info)
     overview_df = pd.DataFrame.from_records(overview_df).drop_duplicates("Host")
-    overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX"]]
+    overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX", "Mem (GB)", "#CPUs Idle", "#CPUs Alloc"]]
     return overview_df
 
 
@@ -284,7 +320,7 @@ def get_squeue():
         response_string = SQUEUE_DEBUG
     else:
         sep = "|"
-        response_string = subprocess.check_output(f"""squeue --format="%.18i{sep}%.2P{sep}%.40j{sep}%.5u{sep}%.8T{sep}%.10M{sep}%.6l{sep}%.4D{sep}%R" --me -S T""", shell=True).decode("utf-8")
+        response_string = subprocess.check_output(f"""squeue --format="%.18i{sep}%Q{sep}%.2P{sep}%.40j{sep}%.5u{sep}%.8T{sep}%.10M{sep}%.6l{sep}%S{sep}%.4D{sep}%R" --me -S T""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=sep)
@@ -315,13 +351,15 @@ def read_log(fn, num_lines=100):
     
     return txt_lines
 
-def run_ui(debug=False):
+def run_ui(debug=False, cluster=None):
     if debug:
         # global for quick debugging
         global DEBUG
         DEBUG = True
     app = SlurmUI()
+    app.cluster = cluster
     app.run()
+
 
 if __name__ == "__main__":
     run_ui()
