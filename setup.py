@@ -8,7 +8,7 @@ setuptools.setup(
     name="slurmui",
     version=__version__,
     author="Norman Müller",
-    author_email="norman.mueller@tum.de",
+    author_email="normanm@meta.com",
     url="https://github.com/SirWyver/slurmui",
     description="Terminal UI for Slurm",
     long_description=long_description,
@@ -24,7 +24,7 @@ setuptools.setup(
         "console_scripts": ["slurmui=slurmui.slurmui_cli:slurmui_cli"],
     },
     install_requires=[
-        "textual==0.31.0",
+        "textual",
         "pandas"
     ],
 )

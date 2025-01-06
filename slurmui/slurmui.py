@@ -19,7 +19,7 @@ else:
 
 DEBUG = False
 if DEBUG:
-    from slurmui.debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
+    from debug_strings import SINFO_DEBUG, SQUEUE_DEBUG
 
 class SlurmUI(App):
 
@@ -28,6 +28,7 @@ class SlurmUI(App):
     BINDINGS = [
         Binding("d", "stage_delete", "Delete job"),
         Binding("l", "display_log", "Log"),
+        Binding("e", "display_error", "Error"),
         Binding("g", "display_gpu", "GPU"),
         Binding("r", "refresh", "Refresh"),
         Binding("s", "sort", "Sort"),
@@ -79,7 +80,9 @@ class SlurmUI(App):
         if self.STAGE["action"] == "monitor":
             self.update_squeue_table()
         elif self.STAGE["action"] == "log":
-            self.update_log(self.STAGE["job_id"])
+            self.update_log(self.STAGE["job_id"], False)
+        elif self.STAGE["action"] == "error":
+            self.update_log(self.STAGE["job_id"], True)
         elif self.STAGE["action"] == "gpu":
             self.update_gpu_table()
 
@@ -137,6 +140,17 @@ class SlurmUI(App):
             self.txt_log.clear()
             self.txt_log.write(str(e))
 
+    def action_display_error(self):
+        try:
+            if self.STAGE["action"] == "monitor":
+                job_id, job_name = self._get_selected_job()
+                self.STAGE = {"action": "error", "job_id": job_id, "job_name": job_name}
+                self._maximize_text_log()
+                self.update_log(job_id, True)
+        except Exception as e:
+            self.txt_log.clear()
+            self.txt_log.write(str(e))
+
     def query_gpus(self,  sort_column=None, sort_ascending=True):
         overview_df = get_sinfo()
         if sort_column is not None:
@@ -185,9 +199,9 @@ class SlurmUI(App):
         self.table.cursor_coordinate  = (0,column_idx)
 
 
-    def update_log(self, job_id):
+    def update_log(self, job_id, error_log=False):
         if not DEBUG:
-            log_fn = get_log_fn(job_id)
+            log_fn = get_log_fn(job_id, error_log=error_log)
             txt_lines = read_log(log_fn)
         else:
             txt_lines = read_log("~/ram_batch_triplane0_l1.txt")
@@ -212,7 +226,7 @@ class SlurmUI(App):
 
 
     def action_abort(self):
-        if self.STAGE["action"] == "log":
+        if self.STAGE["action"] in ["log", "error"]:
             self._minimize_text_log()
         elif self.STAGE["action"] == "gpu":
             self.update_squeue_table()
@@ -232,9 +246,9 @@ def perform_scancel(job_id):
 
 def parse_gres_used(gres_used_str, num_total):
     if len(sys.argv) > 1:
-        _, device, num_gpus, alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\)", gres_used_str).groups()
+        _, device, num_gpus, alloc_str = re.match(r"(.*):(.*):(.*)\(IDX:(.*)\)", gres_used_str).groups()
     else:
-        _, device, num_gpus, alloc_str = re.match("(.*):(.*):(.*)\(IDX:(.*)\),.*", gres_used_str).groups()
+        _, device, num_gpus, alloc_str = re.match(r"(.*):(.*):(.*)\(IDX:(.*)\)", gres_used_str).groups()
 
     num_gpus = int(num_gpus)
     alloc_gpus = []
@@ -256,13 +270,17 @@ def parse_gres_used(gres_used_str, num_total):
 
 def parse_gres(gres_str):
     if len(sys.argv) > 1:
-        _,num_gpus, _ = re.match("(.*):(.*)\(S:(.*)\)", gres_str).groups()
+        _,num_gpus, _ = re.match(r"(.*):(.*)\(S:(.*)\)", gres_str).groups()
         num_gpus = int(num_gpus)
         return {"Device": "gpu",
                 "#Total": num_gpus}
 
     else:
-        _, device, num_gpus = re.match("(.*):(.*):(.*),.*", gres_str).groups()
+        try:
+            _, device, num_gpus = re.match(r"(.*):(.*):(\d+)\(.*\)", gres_str).groups()
+        except:
+            _, device, num_gpus = re.match(r"(.*):(.*):(.*),.*", gres_str).groups()
+            
         num_gpus = int(num_gpus)
         return {"Device": device,
                 "#Total": num_gpus}
@@ -280,7 +298,7 @@ def get_sinfo():
             filter_cluster = f"-p 'mcml-dgx-a100-40x8'"
         else:
             filter_cluster = f""
-        response_string = subprocess.check_output(f"""sinfo --Node {filter_cluster} -O 'NodeHost,Gres:50,GresUsed:80,StateCompact,FreeMem,CPUsState'""", shell=True).decode("utf-8")
+        response_string = subprocess.check_output(f"""sinfo --Node {filter_cluster} -O 'NodeHost:50,Gres:50,GresUsed:80,StateCompact,FreeMem,CPUsState'""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
     df = pd.read_csv(data, sep=" ")
@@ -298,28 +316,31 @@ def get_sinfo():
 
         if not node_available:
             host_info["#Total"] = 0 
-        host_avail_info = parse_gres_used(row[1]['GRES_USED'], host_info["#Total"])
-        host_info.update(host_avail_info)
-        host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
-        host_info['Mem (GB)'] = int(row[1]["FREE_MEM"]) // 1024
+        try:
+            host_avail_info = parse_gres_used(row[1]['GRES_USED'] , host_info["#Total"])
+            host_info.update(host_avail_info)
+            host_info["#Avail"] = host_info['#Total'] - host_info["#Alloc"]
+            host_info['Mem (GB)'] = int(row[1]["FREE_MEM"]) // 1024
 
-        cpu_info = row[1]["CPUS(A/I/O/T)"].split("/")
-        host_info['#CPUs Idle'] = cpu_info[1]
-        host_info['#CPUs Alloc'] = cpu_info[0]
-        host_info['Host'] = str(row[1]["HOSTNAMES"])
+            cpu_info = row[1]["CPUS(A/I/O/T)"].split("/")
+            host_info['#CPUs Idle'] = cpu_info[1]
+            host_info['#CPUs Alloc'] = cpu_info[0]
+            host_info['Host'] = str(row[1]["HOSTNAMES"])
 
-        overview_df.append(host_info)
+            overview_df.append(host_info)
+        except Exception as e:
+            pass #print(f"Error at: {row[1]['GRES_USED'], host_info["#Total"]}")
+
     overview_df = pd.DataFrame.from_records(overview_df).drop_duplicates("Host")
     overview_df = overview_df[['Host', "Device", "#Avail", "#Total", "Free IDX", "Mem (GB)", "#CPUs Idle", "#CPUs Alloc"]]
     return overview_df
 
 
 def get_squeue():
-    
+    sep = "|"
     if DEBUG:
         response_string = SQUEUE_DEBUG
     else:
-        sep = "|"
         response_string = subprocess.check_output(f"""squeue --format="%.18i{sep}%Q{sep}%.2P{sep}%.40j{sep}%.5u{sep}%.8T{sep}%.10M{sep}%.6l{sep}%S{sep}%.4D{sep}%R" --me -S T""", shell=True).decode("utf-8")
     formatted_string = re.sub(' +', ' ', response_string)
     data = io.StringIO(formatted_string)
@@ -340,8 +361,8 @@ def get_job_gpu_ids(job_id):
     return formatted_string
 
 
-def get_log_fn(job_id):
-    response_string = subprocess.check_output(f"""scontrol show job {job_id} | grep StdOut""", shell=True).decode("utf-8")
+def get_log_fn(job_id, error_log=False):
+    response_string = subprocess.check_output(f"""scontrol show job {job_id} | grep {'StdOut' if not error_log else 'StdErr'}""", shell=True).decode("utf-8")
     formatted_string = response_string.split("=")[-1].strip()
     return formatted_string
 
